@@ -418,6 +418,11 @@ input[type=range]::-moz-range-thumb{
 <div class="toast" id="toast"></div>
 
 <script>
+// ← הדביקו כאן את ה-URL של ה-Apps Script לאחר הפריסה
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbwFf7MB9Q25nzcyPxSsN3E3qc_HMUfmA2ydHulvu416BL49Ce5mDQURsQ3E8N_jxDk/exec";
+
+let gameStartTime = null;
+
 const DATA = [
   {c:"קנדה",            flag:"🇨🇦", neg:72},
   {c:'ארה"ב',           flag:"🇺🇸", neg:59},
@@ -478,6 +483,7 @@ function startGame(){
   playerName=document.getElementById('playerName').value.trim()||'שחקן';
   questions=shuffle(DATA);
   current=0;points=100;answers=[];gameOver=false;
+  gameStartTime=Date.now();
   showScreen('screenGame');
   loadQuestion();
 }
@@ -595,6 +601,7 @@ function nextQuestion(){
 function showResults(){
   showScreen('screenResults');
   const count=answers.length;
+  const duration=Math.round((Date.now()-gameStartTime)/1000);
   const rank=RANKS.find(r=>count>=r.min)||RANKS[RANKS.length-1];
 
   document.getElementById('resultsMedal').textContent=rank.medal;
@@ -623,6 +630,24 @@ function showResults(){
     </div>`;
   });
   document.getElementById('breakdownTable').innerHTML=html;
+
+  saveResults(count, duration);
+}
+
+function saveResults(count, duration){
+  if(!SHEETS_URL) return;
+  const payload={
+    name: playerName==='שחקן'?'':playerName,
+    count,
+    duration,
+    answers: answers.map(a=>({c:a.c, guess:a.guess}))
+  };
+  fetch(SHEETS_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).catch(()=>{});
 }
 
 function copyResult(){
