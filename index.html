@@ -463,7 +463,7 @@ const DATA = [
 ];
 
 const RANKS = [
-  {min:36, medal:"🏆", title:"ענית על כל 36 המדינות!",   desc:"תוצאה מושלמת."},
+  {min:36, medal:"🏆", title:"ענית על כל 36 המדינות!",   desc:""},
   {min:28, medal:"🥇", title:"תוצאה יוצאת דופן",          desc:""},
   {min:20, medal:"🥈", title:"תוצאה טובה מאוד",           desc:""},
   {min:12, medal:"🥉", title:"תוצאה סבירה",               desc:""},
@@ -606,7 +606,7 @@ function showResults(){
 
   document.getElementById('resultsMedal').textContent=rank.medal;
   document.getElementById('resultsTitle').textContent=rank.title;
-  document.getElementById('resultsDesc').textContent=`ענית על ${count} מדינות מתוך 36.`;
+  document.getElementById('resultsDesc').textContent=rank.desc;
   document.getElementById('finalScore').textContent=count;
   document.getElementById('finalScoreLabel').textContent=`מדינות מתוך 36`;
   document.getElementById('finalPtsLeft').textContent=points>0?`נותרו ${points} נקודות`:`הנקודות אזלו אחרי ${count} מדינות`;
