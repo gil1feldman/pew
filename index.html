@@ -617,8 +617,7 @@ function showResults(){
   document.getElementById('shareBadge').innerHTML=`
     <span class="big">${rank.medal} ${rank.title}</span>
     <span style="font-family:monospace;letter-spacing:2px;font-size:1.1rem;color:var(--gold)">${bars}</span><br>
-    ענית על ${count} מדינות מתוך 36<br>
-    <span style="font-size:12px;">🌍 נסו גם אתם: gil1feldman.github.io/pew</span>`;
+    ענית על ${count} מדינות מתוך 36`;
 
   // breakdown
   let html=`<div class="rb-row header"><span>מדינה</span><span>ניחוש / אמת</span><span>הפסד</span></div>`;
@@ -656,7 +655,7 @@ function copyResult(){
   const rank=RANKS.find(r=>count>=r.min)||RANKS[RANKS.length-1];
   const filled=Math.round((count/36)*10);
   const bars='█'.repeat(filled)+'░'.repeat(10-filled);
-  const text=`${rank.medal} מה חושבים על נתניהו בעולם?\nענيתי על ${count} מדינות מתוך 36 ${bars}\nנסו גם אתם: https://gil1feldman.github.io/pew/`;
+  const text=`${rank.medal} מה חושבים על נתניהו בעולם?\nעניתי על ${count} מדינות מתוך 36 ${bars}\nנסו גם אתם: https://gil1feldman.github.io/pew/`;
   navigator.clipboard.writeText(text).then(()=>showToast('הועתק! 📋')).catch(()=>showToast('לא ניתן להעתיק'));
 }
 
