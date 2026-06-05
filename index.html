@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>כמה יודעים? — משחק דעת קהל גלובלית</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:#f5f4f0;
+  --surface:#ffffff;
+  --surface2:#eceae4;
+  --border:rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.14);
+  --text:#111113;
+  --muted:#70707a;
+  --accent:#c0281e;
+  --accent2:#1560a8;
+  --gold:#a07800;
+  --gold-bg:#fef9e7;
+  --green:#1a7a4a;
+  --green-bg:#eaf7f0;
+  --orange:#b85c00;
+  --orange-bg:#fdf3e7;
+  --font:'Heebo',sans-serif;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1rem;
+  direction:rtl;
+}
+
+.wrap{width:100%;max-width:560px;}
+
+/* ── SCREENS ── */
+.screen{display:none;animation:fadeUp .35s ease both;}
+.screen.active{display:block;}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(16px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── INTRO ── */
+.intro-globe{font-size:3.5rem;text-align:center;display:block;margin-bottom:1.25rem;}
+
+.game-title{
+  font-size:clamp(1.8rem,6vw,2.6rem);
+  font-weight:900;
+  line-height:1.1;
+  letter-spacing:-.02em;
+  text-align:center;
+  margin-bottom:.5rem;
+  color:var(--text);
+}
+.game-title .hl{color:var(--accent);}
+
+.game-subtitle{
+  text-align:center;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.75;
+  margin-bottom:2rem;
+  max-width:420px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.rules-box{
+  background:var(--surface);
+  border:0.5px solid var(--border2);
+  border-radius:12px;
+  padding:1.25rem 1.5rem;
+  margin-bottom:1.75rem;
+  font-size:13px;
+  color:var(--muted);
+  line-height:1;
+}
+.rules-box ul{list-style:none;}
+.rules-box li{
+  padding:.45rem 1.4rem .45rem 0;
+  position:relative;
+  border-bottom:0.5px solid var(--border);
+  line-height:1.5;
+}
+.rules-box li:last-child{border-bottom:none;}
+.rules-box li::before{
+  content:'›';
+  position:absolute;right:0;
+  color:var(--accent);font-weight:700;font-size:15px;
+}
+
+.name-row{margin-bottom:1.25rem;}
+.name-input{
+  width:100%;
+  background:var(--surface);
+  border:0.5px solid var(--border2);
+  border-radius:8px;
+  padding:.75rem 1rem;
+  color:var(--text);
+  font-family:var(--font);
+  font-size:15px;
+  outline:none;
+  transition:border-color .2s;
+  direction:rtl;
+}
+.name-input:focus{border-color:var(--accent2);}
+.name-input::placeholder{color:var(--muted);}
+
+/* ── BUTTONS ── */
+.btn{
+  display:block;width:100%;
+  padding:.85rem 1.5rem;
+  border-radius:10px;
+  border:none;
+  font-family:var(--font);
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .15s;
+  text-align:center;
+}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#a82018;transform:translateY(-1px);}
+.btn-primary:active{transform:translateY(0);}
+.btn-secondary{
+  background:var(--surface);
+  border:0.5px solid var(--border2);
+  color:var(--text);
+  margin-top:.75rem;
+}
+.btn-secondary:hover{border-color:rgba(0,0,0,.3);}
+
+/* ── GAME HEADER ── */
+.game-header{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:12px;
+  margin-bottom:1.25rem;
+  padding-bottom:1rem;
+  border-bottom:0.5px solid var(--border2);
+}
+.gh-left{font-size:13px;color:var(--muted);}
+.gh-left strong{display:block;font-size:17px;font-weight:800;color:var(--text);line-height:1.1;}
+.gh-right{font-size:13px;color:var(--muted);text-align:left;}
+.gh-right strong{display:block;font-size:17px;font-weight:800;color:var(--accent2);line-height:1.1;}
+
+/* POINTS BAR */
+.points-bar-wrap{margin-bottom:1.5rem;}
+.points-bar-label{
+  display:flex;justify-content:space-between;
+  font-size:11px;color:var(--muted);
+  margin-bottom:4px;
+}
+.points-bar-track{
+  height:10px;background:var(--surface2);
+  border-radius:5px;overflow:hidden;
+  border:0.5px solid var(--border);
+}
+.points-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent2),var(--green));
+  border-radius:5px;
+  transition:width .5s ease;
+}
+.points-bar-fill.warn{background:linear-gradient(90deg,var(--orange),var(--accent));}
+.points-bar-fill.danger{background:var(--accent);}
+
+/* ── COUNTRY CARD ── */
+.country-card{
+  background:var(--surface);
+  border:0.5px solid var(--border2);
+  border-radius:16px;
+  padding:1.75rem 1.5rem;
+  margin-bottom:1.5rem;
+  text-align:center;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+}
+.question-label{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:.75rem;
+}
+.country-flag{font-size:2.75rem;display:block;margin-bottom:.6rem;}
+.country-name{
+  font-size:clamp(1.9rem,6vw,2.8rem);
+  font-weight:900;letter-spacing:-.03em;
+  line-height:1;margin-bottom:.5rem;
+}
+.question-text{font-size:13px;color:var(--muted);line-height:1.6;}
+.question-text strong{color:var(--accent);}
+
+/* ── SLIDER ── */
+.slider-wrap{margin-bottom:1.5rem;}
+.slider-val{
+  text-align:center;
+  font-size:3.5rem;font-weight:900;letter-spacing:-.04em;
+  line-height:1;margin-bottom:.75rem;color:var(--text);
+  transition:color .1s;
+}
+.slider-val span{font-size:1.5rem;font-weight:400;color:var(--muted);}
+.slider-labels{
+  display:flex;justify-content:space-between;
+  font-size:11px;color:var(--muted);margin-bottom:.5rem;
+}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:7px;border-radius:4px;
+  background:var(--surface2);outline:none;cursor:pointer;
+  border:0.5px solid var(--border);
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:26px;height:26px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 4px rgba(192,40,30,0.15),0 1px 4px rgba(0,0,0,.2);
+  cursor:pointer;transition:box-shadow .15s;
+}
+input[type=range]::-webkit-slider-thumb:hover{box-shadow:0 0 0 8px rgba(192,40,30,0.18),0 1px 4px rgba(0,0,0,.2);}
+input[type=range]::-moz-range-thumb{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--accent);border:none;cursor:pointer;
+}
+
+/* ── FEEDBACK ── */
+.feedback{
+  border-radius:12px;padding:1.1rem 1.25rem;
+  margin-bottom:1.25rem;
+  animation:fadeUp .25s ease both;
+  text-align:center;
+}
+.feedback.perfect{background:var(--green-bg);border:0.5px solid rgba(26,122,74,.25);}
+.feedback.good{background:#eef4fd;border:0.5px solid rgba(21,96,168,.2);}
+.feedback.ok{background:var(--orange-bg);border:0.5px solid rgba(184,92,0,.2);}
+.feedback.miss{background:#fdf0ef;border:0.5px solid rgba(192,40,30,.2);}
+
+.feedback-lost{
+  font-size:2rem;font-weight:900;letter-spacing:-.03em;line-height:1;margin-bottom:.2rem;
+}
+.feedback.perfect .feedback-lost{color:var(--green);}
+.feedback.good .feedback-lost{color:var(--accent2);}
+.feedback.ok .feedback-lost{color:var(--orange);}
+.feedback.miss .feedback-lost{color:var(--accent);}
+
+.feedback-text{font-size:13px;color:var(--muted);line-height:1.6;}
+.feedback-real{font-weight:700;font-size:14px;margin-top:.35rem;color:var(--text);}
+
+.compare-bars{margin-top:.75rem;}
+.cb-row{display:flex;align-items:center;gap:8px;margin-bottom:3px;font-size:11px;}
+.cb-label{width:52px;text-align:left;color:var(--muted);flex-shrink:0;}
+.cb-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;border:0.5px solid var(--border);}
+.cb-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+.cb-pct{width:36px;text-align:right;font-weight:700;flex-shrink:0;}
+
+/* ── RESULTS ── */
+.results-header{text-align:center;margin-bottom:1.75rem;}
+.results-medal{font-size:4rem;display:block;margin-bottom:.75rem;}
+.results-title{font-size:clamp(1.5rem,5vw,2.2rem);font-weight:900;letter-spacing:-.02em;margin-bottom:.4rem;}
+.results-desc{
+  color:var(--muted);font-size:13px;line-height:1.6;
+  max-width:380px;margin:0 auto .75rem;
+}
+.final-score-wrap{
+  background:var(--gold-bg);
+  border:0.5px solid rgba(160,120,0,.2);
+  border-radius:12px;
+  padding:1.25rem;
+  margin-bottom:1.5rem;
+  text-align:center;
+}
+.final-score{
+  font-size:4.5rem;font-weight:900;color:var(--gold);
+  letter-spacing:-.05em;line-height:1;
+}
+.final-score-label{font-size:13px;color:var(--muted);margin-top:.25rem;}
+.final-pts-left{font-size:12px;color:var(--muted);margin-top:.2rem;}
+
+.results-breakdown{
+  background:var(--surface);border:0.5px solid var(--border2);
+  border-radius:12px;overflow:hidden;margin:1rem 0;
+}
+.rb-row{
+  display:grid;grid-template-columns:1fr auto auto;gap:8px;
+  align-items:center;padding:.6rem 1rem;
+  border-bottom:0.5px solid var(--border);font-size:13px;
+}
+.rb-row:last-child{border-bottom:none;}
+.rb-row.header{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+.rb-country{font-weight:500;}
+.rb-vals{color:var(--muted);font-size:11px;text-align:center;}
+.rb-lost{font-weight:700;font-size:13px;min-width:36px;text-align:left;}
+.rb-lost.zero{color:var(--green);}
+.rb-lost.low{color:var(--accent2);}
+.rb-lost.mid{color:var(--orange);}
+.rb-lost.high{color:var(--accent);}
+
+.share-badge{
+  background:var(--surface2);border:0.5px solid var(--border2);
+  border-radius:12px;padding:1.1rem;text-align:center;
+  margin-bottom:1.25rem;font-size:13px;color:var(--muted);line-height:1.9;
+}
+.share-badge .big{font-size:1.4rem;font-weight:900;color:var(--text);display:block;}
+
+/* ── GAME OVER MODAL STYLE ── */
+.game-over-banner{
+  background:#fdf0ef;border:0.5px solid rgba(192,40,30,.3);
+  border-radius:12px;padding:1.25rem;text-align:center;margin-bottom:1.5rem;
+}
+.game-over-banner .big{font-size:2rem;font-weight:900;color:var(--accent);display:block;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+  background:var(--text);border-radius:8px;
+  padding:.6rem 1.25rem;font-size:13px;color:var(--bg);
+  pointer-events:none;opacity:0;transition:opacity .2s;
+  z-index:100;white-space:nowrap;
+}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- INTRO -->
+  <div class="screen active" id="screenIntro">
+    <span class="intro-globe">🌍</span>
+    <div class="game-title">כמה <span class="hl">יודעים</span>?</div>
+    <p class="game-subtitle">עד כמה אתם מכירים את דעת הקהל הבינלאומית כלפי נתניהו? נסו לנחש את אחוז חוסר האמון במדינות מרחבי העולם.</p>
+
+    <div class="rules-box">
+      <ul>
+        <li>יש לכם <strong>100 נקודות</strong></li>
+        <li>נחשו את אחוז המשיבים שאין להם אמון בנתניהו בכל מדינה</li>
+        <li>על כל נקודת אחוז שגיאה מנוכה נקודה (עד 15 לשאלה)</li>
+        <li>כמה מדינות תצליחו לנחש לפני שיגמרו לכם כל הנקודות?</li>
+        <li>הנתונים: סקר פיו, אביב 2026</li>
+      </ul>
+    </div>
+
+    <div class="name-row">
+      <input class="name-input" type="text" id="playerName" placeholder="השם שלך (אופציונלי)" maxlength="30">
+    </div>
+    <button class="btn btn-primary" onclick="startGame()">התחל משחק ←</button>
+  </div>
+
+  <!-- GAME -->
+  <div class="screen" id="screenGame">
+    <div class="game-header">
+      <div class="gh-left">
+        שאלה<strong id="qNum">1</strong>
+      </div>
+      <div style="text-align:center;font-size:11px;color:var(--muted);">נקודות שנותרו</div>
+      <div class="gh-right">
+        <strong id="ptsLeft">100</strong>נקודות
+      </div>
+    </div>
+
+    <div class="points-bar-wrap">
+      <div class="points-bar-label">
+        <span id="ptsBarLabel">100 נקודות</span>
+        <span style="color:var(--muted)">מקסימום 100</span>
+      </div>
+      <div class="points-bar-track">
+        <div class="points-bar-fill" id="ptsBarFill" style="width:100%"></div>
+      </div>
+    </div>
+
+    <div class="country-card">
+      <div class="question-label">כמה אחוזים אינם סומכים על נתניהו?</div>
+      <span class="country-flag" id="countryFlag">🌍</span>
+      <div class="country-name" id="countryName">—</div>
+      <div class="question-text">% מהציבור ב<strong id="countryNameInline">—</strong> שאינו סומך על נתניהו בזירה הבינלאומית</div>
+    </div>
+
+    <div class="slider-wrap">
+      <div class="slider-val" id="sliderVal">50<span>%</span></div>
+      <div class="slider-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+      <input type="range" min="0" max="100" value="50" id="guessSlider" oninput="updateSlider(this.value)">
+    </div>
+
+    <div id="feedbackArea"></div>
+
+    <button class="btn btn-primary" id="confirmBtn" onclick="confirmGuess()">אישור ←</button>
+    <button class="btn btn-secondary" id="nextBtn" style="display:none" onclick="nextQuestion()">המדינה הבאה ←</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="screen" id="screenResults">
+    <div class="results-header">
+      <span class="results-medal" id="resultsMedal">🏅</span>
+      <div class="results-title" id="resultsTitle">סיימת!</div>
+      <div class="results-desc" id="resultsDesc"></div>
+    </div>
+
+    <div class="final-score-wrap">
+      <div class="final-score" id="finalScore">—</div>
+      <div class="final-score-label" id="finalScoreLabel"></div>
+      <div class="final-pts-left" id="finalPtsLeft"></div>
+    </div>
+
+    <div class="share-badge" id="shareBadge"></div>
+    <div class="results-breakdown" id="breakdownTable"></div>
+
+    <button class="btn btn-primary" onclick="startGame()">שחק שוב ←</button>
+    <button class="btn btn-secondary" onclick="copyResult()">העתק תוצאה לשיתוף</button>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = [
+  {c:"קנדה",            flag:"🇨🇦", neg:72},
+  {c:'ארה"ב',           flag:"🇺🇸", neg:59},
+  {c:"איטליה",          flag:"🇮🇹", neg:88},
+  {c:"שוודיה",          flag:"🇸🇪", neg:84},
+  {c:"גרמניה",          flag:"🇩🇪", neg:83},
+  {c:"ספרד",            flag:"🇪🇸", neg:82},
+  {c:"צרפת",            flag:"🇫🇷", neg:80},
+  {c:"הולנד",           flag:"🇳🇱", neg:80},
+  {c:"פולין",           flag:"🇵🇱", neg:77},
+  {c:"יוון",            flag:"🇬🇷", neg:76},
+  {c:"בריטניה",         flag:"🇬🇧", neg:75},
+  {c:"הונגריה",         flag:"🇭🇺", neg:65},
+  {c:"מלזיה",           flag:"🇲🇾", neg:89},
+  {c:"פקיסטן",          flag:"🇵🇰", neg:88},
+  {c:"אינדונזיה",       flag:"🇮🇩", neg:83},
+  {c:"יפן",             flag:"🇯🇵", neg:81},
+  {c:"אוסטרליה",        flag:"🇦🇺", neg:78},
+  {c:"קוריאה הדרומית",  flag:"🇰🇷", neg:76},
+  {c:"סינגפור",         flag:"🇸🇬", neg:74},
+  {c:"תאילנד",          flag:"🇹🇭", neg:71},
+  {c:"בנגלדש",          flag:"🇧🇩", neg:68},
+  {c:"סרי לנקה",        flag:"🇱🇰", neg:44},
+  {c:"פיליפינים",       flag:"🇵🇭", neg:40},
+  {c:"הודו",            flag:"🇮🇳", neg:28},
+  {c:"טורקיה",          flag:"🇹🇷", neg:95},
+  {c:"דרום אפריקה",     flag:"🇿🇦", neg:56},
+  {c:"ניגריה",          flag:"🇳🇬", neg:45},
+  {c:"קניה",            flag:"🇰🇪", neg:39},
+  {c:"גאנה",            flag:"🇬🇭", neg:38},
+  {c:"מקסיקו",          flag:"🇲🇽", neg:65},
+  {c:"צ'ילה",           flag:"🇨🇱", neg:64},
+  {c:"ברזיל",           flag:"🇧🇷", neg:64},
+  {c:"ארגנטינה",        flag:"🇦🇷", neg:63},
+  {c:"קולומביה",        flag:"🇨🇴", neg:63},
+  {c:"פרו",             flag:"🇵🇪", neg:57},
+  {c:"גדה מערבית",      flag:"🇵🇸", neg:85},
+];
+
+const RANKS = [
+  {min:36, medal:"🏆", title:"גאון מוחלט",        desc:""},
+  {min:28, medal:"🥇", title:"מומחה בינלאומי",     desc:""},
+  {min:20, medal:"🥈", title:"אנליסט בכיר",        desc:""},
+  {min:12, medal:"🥉", title:"בקיא בינלאומי",      desc:""},
+  {min:6,  medal:"📰", title:"קורא עיתונים",       desc:""},
+  {min:0,  medal:"🌍", title:"מתחיל נלהב",         desc:""},
+];
+
+let questions=[], current=0, points=100, answers=[], guessConfirmed=false, playerName='', gameOver=false;
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function startGame(){
+  playerName=document.getElementById('playerName').value.trim()||'שחקן';
+  questions=shuffle(DATA);
+  current=0;points=100;answers=[];gameOver=false;
+  showScreen('screenGame');
+  loadQuestion();
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function loadQuestion(){
+  guessConfirmed=false;
+  const q=questions[current];
+  document.getElementById('qNum').textContent=current+1;
+  updatePointsBar();
+  document.getElementById('countryFlag').textContent=q.flag;
+  document.getElementById('countryName').textContent=q.c;
+  document.getElementById('countryNameInline').textContent=q.c;
+  document.getElementById('guessSlider').value=50;
+  updateSlider(50);
+  document.getElementById('feedbackArea').innerHTML='';
+  document.getElementById('confirmBtn').style.display='block';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('guessSlider').disabled=false;
+}
+
+function updatePointsBar(){
+  const pct=Math.max(0,points);
+  const fill=document.getElementById('ptsBarFill');
+  fill.style.width=pct+'%';
+  fill.className='points-bar-fill'+(pct<=30?' danger':pct<=50?' warn':'');
+  document.getElementById('ptsLeft').textContent=points;
+  document.getElementById('ptsBarLabel').textContent=points+' נקודות';
+}
+
+function updateSlider(v){
+  document.getElementById('sliderVal').innerHTML=v+'<span>%</span>';
+  const t=v/100;
+  const r=Math.round(t*192+(1-t)*21);
+  const g=Math.round(t*40+(1-t)*96);
+  const b=Math.round(t*30+(1-t)*168);
+  document.getElementById('sliderVal').style.color=`rgb(${r},${g},${b})`;
+}
+
+function confirmGuess(){
+  if(guessConfirmed)return;
+  guessConfirmed=true;
+  const guess=parseInt(document.getElementById('guessSlider').value);
+  const real=questions[current].neg;
+  const diff=Math.abs(guess-real);
+  const lost=Math.min(15,diff);
+
+  points=Math.max(0,points-lost);
+  answers.push({c:questions[current].c,flag:questions[current].flag,guess,real,lost,diff});
+
+  document.getElementById('guessSlider').disabled=true;
+  document.getElementById('confirmBtn').style.display='none';
+  updatePointsBar();
+
+  // feedback class
+  let cls,emoji,msg;
+  if(diff===0)       {cls='perfect';emoji='🎯';msg=`ניחוש מדויק! לא איבדת נקודות. נשארו לך ${points} נקודות.`;}
+  else if(diff<=3)   {cls='perfect';emoji='🔥';msg=`פספסת ב-${diff} אחוזים. איבדת ${lost} נקודות ונשארו לך ${points} נקודות.`;}
+  else if(diff<=6)   {cls='good';   emoji='✅';msg=`פספסת ב-${diff} אחוזים. איבדת ${lost} נקודות ונשארו לך ${points} נקודות.`;}
+  else if(diff<=10)  {cls='ok';     emoji='😐';msg=`פספסת ב-${diff} אחוזים. איבדת ${lost} נקודות ונשארו לך ${points} נקודות.`;}
+  else               {cls='miss';   emoji='❌';msg=`פספסת ב-${diff} אחוזים. איבדת ${lost} נקודות ונשארו לך ${points} נקודות.`;}
+
+  document.getElementById('feedbackArea').innerHTML=`
+    <div class="feedback ${cls}">
+      <div class="feedback-lost">−${lost} ${emoji}</div>
+      <div class="feedback-text">
+        ${msg}
+        <div class="feedback-real">
+          הנתון האמיתי: <span style="color:var(--accent);font-weight:800">${real}%</span>
+          &nbsp;·&nbsp; הניחוש שלך: <span style="color:var(--accent2);font-weight:800">${guess}%</span>
+        </div>
+        <div class="compare-bars">
+          <div class="cb-row">
+            <span class="cb-label" style="color:var(--accent2)">ניחוש</span>
+            <div class="cb-track"><div class="cb-fill" style="width:${guess}%;background:var(--accent2);opacity:.75;"></div></div>
+            <span class="cb-pct" style="color:var(--accent2)">${guess}%</span>
+          </div>
+          <div class="cb-row">
+            <span class="cb-label" style="color:var(--accent)">אמת</span>
+            <div class="cb-track"><div class="cb-fill" style="width:${real}%;background:var(--accent);opacity:.75;"></div></div>
+            <span class="cb-pct" style="color:var(--accent)">${real}%</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // check end conditions
+  const isLast=(current===questions.length-1);
+  if(points<=0){
+    gameOver=true;
+    document.getElementById('nextBtn').textContent='ראה תוצאות ←';
+    document.getElementById('nextBtn').style.display='block';
+  } else if(isLast){
+    document.getElementById('nextBtn').textContent='ראה תוצאות ←';
+    document.getElementById('nextBtn').style.display='block';
+  } else {
+    document.getElementById('nextBtn').textContent='המדינה הבאה ←';
+    document.getElementById('nextBtn').style.display='block';
+  }
+}
+
+function nextQuestion(){
+  if(points<=0||current===questions.length-1){
+    showResults();
+    return;
+  }
+  current++;
+  loadQuestion();
+}
+
+function showResults(){
+  showScreen('screenResults');
+  const count=answers.length;
+  const rank=RANKS.find(r=>count>=r.min)||RANKS[RANKS.length-1];
+
+  document.getElementById('resultsMedal').textContent=rank.medal;
+  document.getElementById('resultsTitle').textContent=rank.title;
+  document.getElementById('resultsDesc').textContent=`הצלחת לנחש ${count} מדינות מתוך 36.`;
+  document.getElementById('finalScore').textContent=count;
+  document.getElementById('finalScoreLabel').textContent=`מדינות מתוך 36`;
+  document.getElementById('finalPtsLeft').textContent=points>0?`נותרו ${points} נקודות`:`הנקודות אזלו אחרי ${count} מדינות`;
+
+  // share badge
+  const filled=Math.round((count/36)*10);
+  const bars='█'.repeat(filled)+'░'.repeat(10-filled);
+  document.getElementById('shareBadge').innerHTML=`
+    <span class="big">${playerName} — ${count} מדינות מתוך 36</span>
+    <span style="font-family:monospace;letter-spacing:2px;font-size:1.1rem;color:var(--gold)">${bars}</span><br>
+    ${rank.medal} ${rank.title} · כמה יודעים? — סקר פיו 2026`;
+
+  // breakdown
+  let html=`<div class="rb-row header"><span>מדינה</span><span>ניחוש / אמת</span><span>הפסד</span></div>`;
+  answers.forEach(a=>{
+    const cls=a.lost===0?'zero':a.lost<=5?'low':a.lost<=10?'mid':'high';
+    html+=`<div class="rb-row">
+      <span class="rb-country">${a.flag} ${a.c}</span>
+      <span class="rb-vals">${a.guess}% / <strong style="color:var(--accent)">${a.real}%</strong></span>
+      <span class="rb-lost ${cls}">−${a.lost}</span>
+    </div>`;
+  });
+  document.getElementById('breakdownTable').innerHTML=html;
+}
+
+function copyResult(){
+  const count=answers.length;
+  const rank=RANKS.find(r=>count>=r.min)||RANKS[RANKS.length-1];
+  const filled=Math.round((count/36)*10);
+  const bars='█'.repeat(filled)+'░'.repeat(10-filled);
+  const lines=answers.map(a=>`${a.flag} ${a.c}: ניחשת ${a.guess}%, אמת ${a.real}% (−${a.lost})`);
+  const text=`כמה יודעים? — סקר פיו 2026\n${playerName}: ${count}/36 מדינות ${rank.medal} ${rank.title}\n${bars}\n\n${lines.join('\n')}`;
+  navigator.clipboard.writeText(text).then(()=>showToast('הועתק! 📋')).catch(()=>showToast('לא ניתן להעתיק'));
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+</script>
+</body>
+</html>
