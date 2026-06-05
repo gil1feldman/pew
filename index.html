@@ -463,12 +463,12 @@ const DATA = [
 ];
 
 const RANKS = [
-  {min:36, medal:"🏆", title:"גאון מוחלט",        desc:""},
-  {min:28, medal:"🥇", title:"מומחה בינלאומי",     desc:""},
-  {min:20, medal:"🥈", title:"אנליסט בכיר",        desc:""},
-  {min:12, medal:"🥉", title:"בקיא בינלאומי",      desc:""},
-  {min:6,  medal:"📰", title:"קורא עיתונים",       desc:""},
-  {min:0,  medal:"🌍", title:"מתחיל נלהב",         desc:""},
+  {min:36, medal:"🏆", title:"ענית על כל 36 המדינות!",   desc:"תוצאה מושלמת."},
+  {min:28, medal:"🥇", title:"תוצאה יוצאת דופן",          desc:""},
+  {min:20, medal:"🥈", title:"תוצאה טובה מאוד",           desc:""},
+  {min:12, medal:"🥉", title:"תוצאה סבירה",               desc:""},
+  {min:6,  medal:"😅", title:"הנתונים מפתיעים",           desc:""},
+  {min:0,  medal:"😬", title:"נגמרו הנקודות מהר",         desc:""},
 ];
 
 let questions=[], current=0, points=100, answers=[], guessConfirmed=false, playerName='', gameOver=false;
@@ -615,9 +615,10 @@ function showResults(){
   const filled=Math.round((count/36)*10);
   const bars='█'.repeat(filled)+'░'.repeat(10-filled);
   document.getElementById('shareBadge').innerHTML=`
-    <span class="big">${playerName} — ${count} מדינות מתוך 36</span>
+    <span class="big">${rank.medal} ${rank.title}</span>
     <span style="font-family:monospace;letter-spacing:2px;font-size:1.1rem;color:var(--gold)">${bars}</span><br>
-    ${rank.medal} ${rank.title} · כמה יודעים? — סקר פיו 2026`;
+    ענית על ${count} מדינות מתוך 36<br>
+    <span style="font-size:12px;">🌍 נסו גם אתם: gil1feldman.github.io/pew</span>`;
 
   // breakdown
   let html=`<div class="rb-row header"><span>מדינה</span><span>ניחוש / אמת</span><span>הפסד</span></div>`;
@@ -655,8 +656,7 @@ function copyResult(){
   const rank=RANKS.find(r=>count>=r.min)||RANKS[RANKS.length-1];
   const filled=Math.round((count/36)*10);
   const bars='█'.repeat(filled)+'░'.repeat(10-filled);
-  const lines=answers.map(a=>`${a.flag} ${a.c}: ניחשת ${a.guess}%, אמת ${a.real}% (−${a.lost})`);
-  const text=`כמה יודעים? — סקר פיו 2026\n${playerName}: ${count}/36 מדינות ${rank.medal} ${rank.title}\n${bars}\n\n${lines.join('\n')}`;
+  const text=`${rank.medal} מה חושבים על נתניהו בעולם?\nענيתי על ${count} מדינות מתוך 36 ${bars}\nנסו גם אתם: https://gil1feldman.github.io/pew/`;
   navigator.clipboard.writeText(text).then(()=>showToast('הועתק! 📋')).catch(()=>showToast('לא ניתן להעתיק'));
 }
 
